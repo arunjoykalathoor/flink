@@ -54,7 +54,7 @@ public class HeapBroadcastState<K, V> implements BackendWritableBroadcastState<K
 	 */
 	private final MapSerializer<K, V> internalMapCopySerializer;
 
-	HeapBroadcastState(RegisteredBroadcastStateBackendMetaInfo<K, V> stateMetaInfo) {
+	public HeapBroadcastState(RegisteredBroadcastStateBackendMetaInfo<K, V> stateMetaInfo) {
 		this(stateMetaInfo, new HashMap<>());
 	}
 

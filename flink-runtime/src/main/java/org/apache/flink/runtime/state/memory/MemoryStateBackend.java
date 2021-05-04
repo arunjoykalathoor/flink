@@ -33,7 +33,6 @@ import org.apache.flink.runtime.state.AbstractStateBackend;
 import org.apache.flink.runtime.state.BackendBuildingException;
 import org.apache.flink.runtime.state.CheckpointStorage;
 import org.apache.flink.runtime.state.ConfigurableStateBackend;
-import org.apache.flink.runtime.state.DefaultOperatorStateBackendBuilder;
 import org.apache.flink.runtime.state.KeyGroupRange;
 import org.apache.flink.runtime.state.KeyedStateHandle;
 import org.apache.flink.runtime.state.OperatorStateBackend;
@@ -42,6 +41,7 @@ import org.apache.flink.runtime.state.TaskStateManager;
 import org.apache.flink.runtime.state.filesystem.AbstractFileStateBackend;
 import org.apache.flink.runtime.state.heap.HeapKeyedStateBackendBuilder;
 import org.apache.flink.runtime.state.heap.HeapPriorityQueueSetFactory;
+import org.apache.flink.runtime.state.heap.remote.HeapOperatorStateBackendBuilder;
 import org.apache.flink.runtime.state.heap.remote.RemoteHeapKeyedStateBackendBuilder;
 import org.apache.flink.runtime.state.ttl.TtlTimeProvider;
 import org.apache.flink.util.TernaryBoolean;
@@ -320,12 +320,14 @@ public class MemoryStateBackend extends AbstractFileStateBackend implements Conf
 		@Nonnull Collection<OperatorStateHandle> stateHandles,
 		CloseableRegistry cancelStreamRegistry) throws Exception {
 
-		return new DefaultOperatorStateBackendBuilder(
+		return new HeapOperatorStateBackendBuilder(
 			env.getUserClassLoader(),
 			env.getExecutionConfig(),
 			isUsingAsynchronousSnapshots(),
 			stateHandles,
-			cancelStreamRegistry).build();
+			cancelStreamRegistry,
+			this.backendHost
+		).build();
 	}
 
 	@Override
