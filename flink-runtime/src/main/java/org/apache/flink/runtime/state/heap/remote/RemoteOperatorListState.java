@@ -134,7 +134,7 @@ class RemoteOperatorListState<K, N, V>
 	public List<V> getInternal() {
 		try {
 			byte[] key = serializeCurrentKeyWithGroupAndNamespaceDesc(kvStateInfo.nameBytes);
-			byte[] valueBytes =syncRemClient.get(key);
+			List<byte[]> valueBytes =syncRemClient.lrange(key,0,1);
 			return deserializeList(valueBytes);
 		} catch (Exception e) {
 			throw new FlinkRuntimeException("Error while retrieving data from remote heap", e);
@@ -142,17 +142,18 @@ class RemoteOperatorListState<K, N, V>
 	}
 
 	private List<V> deserializeList(
-		byte[] valueBytes) {
+		List<byte[]> valueBytes) {
 		if (valueBytes == null) {
 			return null;
 		}
-
-		dataInputView.setBuffer(valueBytes);
-
 		List<V> result = new ArrayList<>();
-		V next;
-		while ((next = deserializeNextElement(dataInputView, elementSerializer)) != null) {
-			result.add(next);
+		for(byte[] elementByte: valueBytes) {
+			dataInputView.setBuffer(elementByte);
+
+			V next;
+			while ((next = deserializeNextElement(dataInputView, elementSerializer)) != null) {
+				result.add(next);
+			}
 		}
 		return result;
 	}
@@ -250,6 +251,7 @@ class RemoteOperatorListState<K, N, V>
 
 		if (!valueToStore.isEmpty()) {
 			try {
+				syncRemClient.del(serializeCurrentKeyWithGroupAndNamespaceDesc(kvStateInfo.nameBytes));
 				syncRemClient.lpush(
 					serializeCurrentKeyWithGroupAndNamespaceDesc(kvStateInfo.nameBytes),
 					serializeValueList(valueToStore, elementSerializer, DELIMITER));

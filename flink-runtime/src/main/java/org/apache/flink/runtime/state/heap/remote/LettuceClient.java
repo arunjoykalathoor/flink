@@ -7,6 +7,9 @@ import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.codec.ByteArrayCodec;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -293,5 +296,17 @@ public class LettuceClient implements RemoteKVSyncClient, RemoteKVAsyncClient {
 	@Override
 	public CompletableFuture<Long> lpushAsync(byte[] key, byte[]... strings) {
 		return commands.lpush(key, strings).toCompletableFuture();
+	}
+
+	@Override
+	public List<byte[]> lrange(byte[] key,long start,long stop) {
+		try {
+			return commands.lrange(key,start,stop).toCompletableFuture().get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

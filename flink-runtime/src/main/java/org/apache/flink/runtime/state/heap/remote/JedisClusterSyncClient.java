@@ -1,5 +1,7 @@
 package org.apache.flink.runtime.state.heap.remote;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.HostAndPort;
@@ -107,6 +109,11 @@ public class JedisClusterSyncClient implements RemoteKVSyncClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public List<byte[]> lrange(byte[] key, long start, long stop) {
+		return null; //TODO
 	}
 
 	@Override

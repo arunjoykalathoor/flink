@@ -1,5 +1,7 @@
 package org.apache.flink.runtime.state.heap.remote;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import java.util.Collection;
@@ -36,4 +38,7 @@ public interface RemoteKVSyncClient extends RemoteKVClient {
 	void pipelineHSet(byte[] key, byte[] field, byte[] value);
 
 	void pipelineHDel(byte[] key, byte[] field);
+
+	List<byte[]> lrange(byte[] key, long start, long stop);
+
 }
